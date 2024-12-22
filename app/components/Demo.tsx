@@ -21,17 +21,19 @@ export default function Demo() {
   const [context, setContext] = useState<FrameContext | null>(null);
   const [isContextOpen, setIsContextOpen] = useState(false);
   const [beats, setBeats] = useState<Beat[]>([]);
-  const [txHash, setTxHash] = useState<string | null>(null);
+  const [txHash] = useState<string | null>(null);
 
-  const { address, isConnected } = useAccount();
+  const {isConnected } = useAccount();
   const {
     sendTransaction,
     error: sendTxError,
     isError: isSendTxError,
-    isPending: isSendTxPending,
+    // isPending: isSendTxPending,
   } = useSendTransaction();
   const { disconnect } = useDisconnect();
-  const { connect } = useConnect();
+//   const { connect } = useConnect();
+  const { connect, connectors } = useConnect();
+
   const { isLoading: isConfirming, isSuccess: isConfirmed } =
     useWaitForTransactionReceipt({ hash: txHash as `0x${string}` });
 
@@ -77,15 +79,16 @@ export default function Demo() {
         alert("Please connect your wallet to buy this beat.");
         return;
       }
-
+  
       try {
-        const transaction = await sendTransaction({
-          to: "0x4bBFD120d9f352A0BEd7a014bd67913a2007a878", // Replace with your smart contract address
+        // Send the transaction
+        sendTransaction({
+          to: "0x5F1d11Ebb824b3699D8E4E75B5Ddf6C2635c71Db", // Replace with your smart contract address
           value: BigInt(parseFloat(beat.price) * 1e18), // Convert ETH to Wei
         });
-
-        setTxHash(transaction.hash);
-        alert(`Transaction sent! Hash: ${transaction.hash}`);
+  
+        // Monitor transaction receipt using wagmi hooks
+        alert("Transaction sent! Check your wallet or transaction tracker for updates.");
       } catch (error) {
         console.error("Transaction failed:", error);
         alert("Transaction failed. Please try again.");
@@ -93,6 +96,7 @@ export default function Demo() {
     },
     [isConnected, sendTransaction]
   );
+  
 
   const redirect = useCallback(() => {
     sdk.actions.openUrl("https://example-redirect-url.com");
@@ -123,7 +127,7 @@ export default function Demo() {
 
         <button
           onClick={() =>
-            isConnected ? disconnect() : connect()
+            isConnected ? disconnect() : connect({ connector: connectors[0] })
           }
           className="w-full px-4 py-2 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600"
         >
