@@ -99,7 +99,7 @@ export default function Demo() {
   
 
   const redirect = useCallback(() => {
-    sdk.actions.openUrl("https://example-redirect-url.com");
+    sdk.actions.openUrl("https://sounl1nk.vercel.app/");
   }, []);
 
   const toggleContext = useCallback(() => {
